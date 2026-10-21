@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#183f35">
+  <meta name="description" content="강의 자료의 강조 표시와 20문항 유형을 바탕으로 만든 컴퓨터언어 II 지필 모의고사. 5회분, 답안 저장, 정답 해설과 시험지 인쇄.">
+  <title>컴퓨터언어 II · 지필 모의고사</title>
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./src/style.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">본문으로 건너뛰기</a>
+  <header class="site-header">
+    <a class="brand" href="#/"><span class="brand-icon" aria-hidden="true">C<span>++</span></span><span>컴퓨터언어 II<small>지필 모의고사</small></span></a>
+    <nav aria-label="주 메뉴"><a href="#/">시험 목록</a><a href="#/study">핵심 정리</a><a href="#/guide">출제 기준</a></nav>
+    <span class="header-note">생각하고, 써 보고, 확인하기.</span>
+  </header>
+  <main id="main" tabindex="-1"></main>
+  <div id="print-root"></div>
+  <dialog id="confirm-dialog" aria-labelledby="dialog-title">
+    <h2 id="dialog-title"></h2><p id="dialog-message"></p>
+    <form method="dialog"><button value="cancel" class="button secondary">취소</button><button value="confirm" class="button" id="dialog-confirm">확인</button></form>
+  </dialog>
+  <div id="toast" class="toast" role="status"></div>
+  <script type="module" src="./src/app.js"></script>
+</body>
+</html>
