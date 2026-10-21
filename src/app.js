@@ -46,29 +46,29 @@ function save() {
 function renderHome() {
   paper = null; state = null;
   const completed = papers.filter(p => getState(p.id).submitted).length;
+  const written = papers.reduce((sum, p) => sum + countAnswered(p, getState(p.id)), 0);
+  const next = papers.find(p => !getState(p.id).submitted && countAnswered(p, getState(p.id))) || papers.find(p => !getState(p.id).submitted) || papers[0];
   main.innerHTML = `<div class="home wrap">
-    <section class="hero">
-      <div><p class="eyebrow">COMPUTER LANGUAGE II / MIDTERM PRACTICE</p>
-      <h1>손으로 생각하는<br><span class="highlight">C++ 모의고사</span></h1>
-      <p class="hero-copy">읽고, 고치고, 실행 흐름을 따라가 보세요.<br>강의의 강조 표시와 안내받은 20문항 구성을 담았습니다.</p>
-      <div class="hero-actions"><a class="button" href="#/exam/01">1회 모의고사 풀기 <span aria-hidden="true">↗</span></a><a class="text-link" href="#/study">중요한 개념 먼저 공부하기 →</a></div></div>
-      <div class="paper-preview" aria-label="총 ${papers.length}회, 회차별 20문항, 컴파일 없이 답안 작성">
-        <span class="paper-clip" aria-hidden="true"></span><div class="mini-label">중간고사 대비</div><h2>문제를 읽고<br>답을 써 보세요.</h2>
-        <div class="preview-line"><span>01</span> 개념을 정확하게 구분하기</div><div class="preview-line"><span>02</span> 출력 결과를 손으로 추적하기</div><div class="preview-line"><span>03</span> 익숙한 실습을 다시 작성하기</div>
-        <div class="paper-foot"><strong>20 <small>문항 ×</small> ${papers.length} <small>회</small></strong><span class="pencil-note">컴파일 없이!</span></div>
-      </div>
+    <div class="dashboard-heading"><div><p class="eyebrow">YOUR STUDY SPACE</p><h1>학습 대시보드</h1><p>개념을 확인하고, 코드의 흐름을 직접 따라가 보세요.</p></div><span class="course-badge">지필 시험 연습</span></div>
+    <section class="overview-stats" aria-label="학습 현황">
+      <div class="stat-card"><span class="stat-icon" aria-hidden="true">✓</span><div><span>제출한 시험</span><strong>${completed}<small> / ${papers.length}회</small></strong></div><span class="stat-detail">회차별 복습</span></div>
+      <div class="stat-card"><span class="stat-icon violet" aria-hidden="true">{ }</span><div><span>작성한 답</span><strong>${written}<small> / 100문항</small></strong></div><span class="stat-detail">자동 저장</span></div>
+      <div class="stat-card"><span class="stat-icon amber" aria-hidden="true">≡</span><div><span>핵심 정리</span><strong>10<small>개 주제</small></strong></div><a class="stat-link" href="#/study" aria-label="핵심 정리 공부하기">↗</a></div>
     </section>
-    <section class="exam-list" aria-labelledby="list-title"><div class="section-heading"><div><p class="eyebrow">CHOOSE YOUR PAPER</p><h2 id="list-title">어느 시험부터 풀까요?</h2></div><span class="completion">${completed} / ${papers.length}회 제출 완료</span></div>
+    <section class="hero">
+      <div><p class="eyebrow"><span class="live-dot"></span> C++ MIDTERM PRACTICE</p><h2>한 문제씩,<br>확실하게 익히는 C++.</h2><p class="hero-copy">강의의 강조 표시와 교재를 담은 20문항 × 5회.<br>직접 답을 쓰고, 해설로 이해를 확인하세요.</p><a class="button" href="#/exam/${next.id}">${Number(next.id)}회 ${getState(next.id).submitted ? '다시 살펴보기' : countAnswered(next, getState(next.id)) ? '이어서 풀기' : '시작하기'} <span aria-hidden="true">→</span></a></div>
+      <div class="hero-progress"><div class="progress-ring" style="--progress:${written * 3.6}deg" role="img" aria-label="전체 100문항 중 ${written}문항 작성"><div><strong>${written}<small>%</small></strong><span>전체 답안 작성</span></div></div><span class="progress-caption">조금씩 쌓이는 나의 기록</span></div>
+    </section>
+    <div class="dashboard-grid"><section class="exam-list" aria-labelledby="list-title"><div class="section-heading"><div><h2 id="list-title">모의고사 목록 <span>05</span></h2><p>회차마다 새로운 20문항을 준비했어요.</p></div><span class="completion">${completed} / ${papers.length}회 완료</span></div>
     <div class="paper-cards">${papers.map(p => {
       const s = getState(p.id); const n = countAnswered(p, s); const result = score(p, s);
-      return `<article class="paper-card"><div class="card-top"><span class="paper-number">${p.id}</span><span class="tag ${s.submitted ? 'green' : ''}">${s.submitted ? '제출 완료' : n ? '작성 중' : '시작 전'}</span></div>
-        <h3>${p.title}</h3><p>${p.subtitle}</p><div class="card-meta"><span>20문항</span><span>개념 · 코드 수정 · 서술형</span></div>
-        <div class="card-progress"><span style="width:${n * 5}%"></span></div><div class="progress-copy">${s.submitted ? `확인된 정답 ${result.correct} / 20 · 직접 확인 ${result.review}개` : `작성한 답 ${n} / 20`}</div>
-        <a class="button ${p.id === '01' ? '' : 'secondary'}" href="#/exam/${p.id}">${s.submitted ? '결과와 해설 보기' : n ? '이어서 풀기' : `${Number(p.id)}회 시작하기`} <span aria-hidden="true">→</span></a>
+      return `<article class="paper-card"><span class="paper-number">${p.id}</span><div class="paper-info"><div class="card-top"><h3>${p.title}</h3><span class="tag ${s.submitted ? 'green' : n ? 'blue' : ''}">${s.submitted ? '제출 완료' : n ? '작성 중' : '시작 전'}</span></div><p>${p.subtitle}</p><div class="card-meta"><span>20문항</span><span>개념 · 코드 수정 · 서술형</span></div></div>
+        <div class="paper-progress"><div class="progress-copy">${s.submitted ? `정답 ${result.correct} / 20` : `${n} / 20 작성`}</div><div class="card-progress"><span style="width:${n * 5}%"></span></div>${s.submitted && result.review ? `<small>직접 확인 ${result.review}개</small>` : ''}</div>
+        <a class="button ${p.id === next.id ? '' : 'secondary'} small" href="#/exam/${p.id}" aria-label="${Number(p.id)}회 ${s.submitted ? '결과와 해설 보기' : n ? '이어서 풀기' : '시작하기'}">${s.submitted ? '해설 보기' : n ? '이어서 풀기' : '시작하기'} <span aria-hidden="true">→</span></a>
       </article>`;
     }).join('')}</div></section>
-    <section class="study-strip"><div class="star-mark" aria-hidden="true">★★★</div><div><h2>별 3개는 매 회차에.</h2><p>접근 지정자부터 생성자·소멸자, 출력 추적까지.<br>핵심 정리에서 비교표와 예제로 공부한 뒤 시험에 도전하세요.</p></div><a href="#/study" class="text-link">핵심 정리 공부하기 →</a></section>
-    <footer class="home-footer"><span>답안은 이 브라우저에 자동 저장됩니다. 기기·브라우저 간 공유는 되지 않습니다.</span><span>종이에 풀고 싶다면 시험 화면에서 <strong>시험지 인쇄</strong></span></footer>
+    <aside class="dashboard-aside"><section class="study-strip"><span class="panel-label">STUDY NOTE</span><div class="star-mark" aria-hidden="true">★★★</div><h2>중요한 개념부터<br>차근차근.</h2><p>별 3개 접근 지정자는 매 회차에.<br>비교표와 예제로 먼저 정리하세요.</p><ul class="topic-preview"><li><span>01</span>public · private · protected</li><li><span>02</span>생성자와 소멸자</li><li><span>03</span>코드 실행 순서</li></ul><a href="#/study" class="button full secondary">핵심 정리 공부하기 →</a></section><section class="print-tip"><span aria-hidden="true">↳</span><h3>종이에 풀어도 좋아요.</h3><p>시험 화면의 <strong>시험지 인쇄</strong>로<br>실제 시험처럼 연습해 보세요.</p></section></aside></div>
+    <footer class="home-footer"><span><i></i> 답안은 이 브라우저에 자동 저장됩니다.</span><span>기기·브라우저 간 공유는 되지 않습니다.</span></footer>
   </div>`;
 }
 
@@ -252,7 +252,8 @@ window.addEventListener('afterprint', () => { document.body.classList.remove('pr
 
 function route() {
   const hash = location.hash || '#/';
-  document.querySelectorAll('.site-header nav a').forEach(a => a.setAttribute('aria-current', a.hash === hash ? 'page' : 'false'));
+  const navHash = hash.startsWith('#/exam/') ? '#/' : hash;
+  document.querySelectorAll('.site-header nav a').forEach(a => a.setAttribute('aria-current', a.hash === navHash ? 'page' : 'false'));
   if (hash === '#/guide') renderGuide();
   else if (hash === '#/study') renderStudy();
   else if (hash.startsWith('#/exam/')) {
@@ -261,6 +262,7 @@ function route() {
     else main.innerHTML = '<div class="wrap guide"><h1>시험을 찾을 수 없습니다.</h1><a href="#/">시험 목록으로 돌아가기</a></div>';
   } else renderHome();
   document.title = paper ? `${Number(paper.id)}회 모의고사 · 컴퓨터언어 II` : hash === '#/study' ? '핵심 정리 · 컴퓨터언어 II' : '컴퓨터언어 II · 지필 모의고사';
+  document.querySelector('#route-label').textContent = paper ? `${Number(paper.id)}회 모의고사` : hash === '#/study' ? '핵심 정리' : hash === '#/guide' ? '출제 기준' : '학습 대시보드';
   window.scrollTo(0, 0);
 }
 window.addEventListener('hashchange', route);

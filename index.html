@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#183f35">
+  <meta name="theme-color" content="#111b31">
   <meta name="description" content="강의 자료의 강조 표시와 20문항 유형을 바탕으로 만든 컴퓨터언어 II 지필 모의고사. 5회분, 답안 저장, 정답 해설과 시험지 인쇄.">
   <title>컴퓨터언어 II · 지필 모의고사</title>
   <link rel="icon" href="./favicon.svg" type="image/svg+xml">
@@ -12,10 +12,16 @@
 <body>
   <a class="skip-link" href="#main">본문으로 건너뛰기</a>
   <header class="site-header">
-    <a class="brand" href="#/"><span class="brand-icon" aria-hidden="true">C<span>++</span></span><span>컴퓨터언어 II<small>지필 모의고사</small></span></a>
-    <nav aria-label="주 메뉴"><a href="#/">시험 목록</a><a href="#/study">핵심 정리</a><a href="#/guide">출제 기준</a></nav>
-    <span class="header-note">생각하고, 써 보고, 확인하기.</span>
+    <a class="brand" href="#/"><span class="brand-icon" aria-hidden="true">C<span>++</span></span><span>컴퓨터언어 II<small>EXAM WORKSPACE</small></span></a>
+    <p class="nav-caption">MY LEARNING</p>
+    <nav aria-label="주 메뉴">
+      <a href="#/"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>시험 목록<span class="nav-count">05</span></a>
+      <a href="#/study"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v16M12 5C9 3 5 3 3 4v15c3-1 6-1 9 2 3-3 6-3 9-2V4c-2-1-6-1-9 1Z"/></svg>핵심 정리</a>
+      <a href="#/guide"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 3H5v18h14V7l-4-4ZM14 3v5h5M8 12h8M8 16h5"/></svg>출제 기준</a>
+    </nav>
+    <div class="sidebar-note"><span class="sidebar-note-mark" aria-hidden="true">{ }</span><strong>읽고, 쓰고, 이해하기.</strong><p>손으로 코드를 따라가며<br>지필 시험을 준비하세요.</p><span class="local-status"><i></i>이 브라우저에 자동 저장</span></div>
   </header>
+  <div class="workspace-topbar"><div><span>컴퓨터언어 II</span><span class="breadcrumb-divider">/</span><strong id="route-label">학습 대시보드</strong></div><span class="workspace-term">중간고사 대비 <span>C++</span></span></div>
   <main id="main" tabindex="-1"></main>
   <div id="print-root"></div>
   <dialog id="confirm-dialog" aria-labelledby="dialog-title">
