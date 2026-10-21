@@ -262,7 +262,8 @@ function route() {
     else main.innerHTML = '<div class="wrap guide"><h1>시험을 찾을 수 없습니다.</h1><a href="#/">시험 목록으로 돌아가기</a></div>';
   } else renderHome();
   document.title = paper ? `${Number(paper.id)}회 모의고사 · 컴퓨터언어 II` : hash === '#/study' ? '핵심 정리 · 컴퓨터언어 II' : '컴퓨터언어 II · 지필 모의고사';
-  document.querySelector('#route-label').textContent = paper ? `${Number(paper.id)}회 모의고사` : hash === '#/study' ? '핵심 정리' : hash === '#/guide' ? '출제 기준' : '학습 대시보드';
+  const routeLabel = document.querySelector('#route-label');
+  if (routeLabel) routeLabel.textContent = paper ? `${Number(paper.id)}회 모의고사` : hash === '#/study' ? '핵심 정리' : hash === '#/guide' ? '출제 기준' : '학습 대시보드';
   window.scrollTo(0, 0);
 }
 window.addEventListener('hashchange', route);

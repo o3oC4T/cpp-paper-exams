@@ -25,6 +25,10 @@ npm run test:browser
 npm run dev                 (http://127.0.0.1:4185)
 npm run build               (배포 파일: dist)
 
+배포 시 HTML 안에 CSS와 번들 스크립트를 함께 담습니다.
+GitHub Pages의 개별 파일 캐시에 이전 디자인이 남아 화면이 섞이는 현상을 방지합니다.
+esbuild는 배포 파일 생성에만 사용하며, 사이트 실행 시 별도의 서비스를 호출하지 않습니다.
+
 문항 데이터: src/paper1.js ~ src/paper5.js
 강조 표시와 자료 목록: src/sources.js
 핵심 정리: src/study.js

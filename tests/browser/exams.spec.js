@@ -1,6 +1,22 @@
 import { test, expect } from '@playwright/test';
 import { papers } from '../../src/bank.js';
 
+test('published page cannot combine its layout with stale standalone CSS or scripts', async ({page}) => {
+  const legacyRequests = [];
+  await page.route('**/src/**', route => {
+    legacyRequests.push(route.request().url());
+    return route.fulfill({contentType:'text/css',body:'body { display: none !important; }'});
+  });
+  await page.goto('/');
+  await expect(page.locator('.overview-stats')).toBeVisible();
+  await expect(page.locator('.paper-card')).toHaveCount(5);
+  expect(await page.locator('.site-header').evaluate(el => getComputedStyle(el).position)).toBe('fixed');
+  expect(await page.locator('.site-header nav svg').first().evaluate(el => el.getBoundingClientRect().width)).toBe(18);
+  await page.getByRole('link', {name:'핵심 정리',exact:true}).click();
+  await expect(page.locator('.study-section')).toHaveCount(10);
+  expect(legacyRequests).toEqual([]);
+});
+
 test('five papers each expose 20 questions, mandatory stars, sources and no answer before submission', async ({ page }) => {
   await page.goto('/');
   await expect(page.locator('.paper-card')).toHaveCount(5);
