@@ -3,8 +3,10 @@ import { sources, blueprint, emphasis, standardNotes } from './sources.js';
 import { answered, grade, score, answerText } from './grading.js';
 import { freshState, loadState, saveState } from './storage.js';
 import { studySections, practiceReview } from './study.js';
+import { renderConcepts, bindConceptEvents, conceptHomeCard } from './concepts.js';
 
 const main = document.querySelector('#main');
+bindConceptEvents(main);
 const memory = new Map();
 let paper, state, toastTimer;
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -59,6 +61,7 @@ function renderHome() {
       <div><p class="eyebrow"><span class="live-dot"></span> C++ MIDTERM PRACTICE</p><h2>한 문제씩,<br>확실하게 익히는 C++.</h2><p class="hero-copy">강의의 강조 표시와 교재를 담은 20문항 × 5회.<br>직접 답을 쓰고, 해설로 이해를 확인하세요.</p><a class="button" href="#/exam/${next.id}">${Number(next.id)}회 ${getState(next.id).submitted ? '다시 살펴보기' : countAnswered(next, getState(next.id)) ? '이어서 풀기' : '시작하기'} <span aria-hidden="true">→</span></a></div>
       <div class="hero-progress"><div class="progress-ring" style="--progress:${written * 3.6}deg" role="img" aria-label="전체 100문항 중 ${written}문항 작성"><div><strong>${written}<small>%</small></strong><span>전체 답안 작성</span></div></div><span class="progress-caption">조금씩 쌓이는 나의 기록</span></div>
     </section>
+    ${conceptHomeCard()}
     <div class="dashboard-grid"><section class="exam-list" aria-labelledby="list-title"><div class="section-heading"><div><h2 id="list-title">모의고사 목록 <span>05</span></h2><p>회차마다 새로운 20문항을 준비했어요.</p></div><span class="completion">${completed} / ${papers.length}회 완료</span></div>
     <div class="paper-cards">${papers.map(p => {
       const s = getState(p.id); const n = countAnswered(p, s); const result = score(p, s);
@@ -91,6 +94,7 @@ function renderStudy() {
   paper = null; state = null;
   main.innerHTML = `<div class="wrap study"><a href="#/" class="back-link">← 시험 목록</a><p class="eyebrow">STUDY BEFORE THE TEST</p><div class="study-title"><div><h1>중요한 부분부터,<br><span class="highlight">한 번에 정리.</span></h1><p class="lead">색으로 강조한 개념을 비교표와 코드로 익히세요.<br>정답을 외우기 전에, 왜 그런지 확인하는 공간입니다.</p></div><div class="study-callout"><span>★★★</span><strong>가장 먼저 복습</strong><p>5장 63쪽<br>public · private · protected</p></div></div>
     <p class="study-note">『명품 C++ Programming』 3판의 해당 개념과 함께 정리했습니다. 각 주제 아래에서 강의 자료와 책의 쪽수를 확인하세요.</p>
+    <a class="concept-study-link" href="#/learn">개념이 아직 낯설다면? 단계별 설명과 실행 추적으로 공부하기 →</a>
     <div class="study-layout"><aside class="study-nav" aria-label="핵심 정리 목차"><h2>학습 목차</h2>${studySections.map((s, i) => `<button data-study-jump="${s.id}"><span>${String(i + 1).padStart(2, '0')}</span>${esc(s.title.split(':')[0])}</button>`).join('')}<button data-study-jump="practice"><span>10</span>실습 손코딩 체크</button><a class="button full small" href="#/exam/01">1회 풀어보기 →</a></aside>
     <div class="study-main">${studySections.map((s, i) => `<section id="study-${s.id}" class="study-section"><div class="study-section-meta"><span class="eyebrow">NOTE ${String(i + 1).padStart(2, '0')}</span><span class="study-badge">${esc(s.badge)}</span></div><h2>${esc(s.title)}</h2><p class="study-intro">${esc(s.intro)}</p>
       ${s.table ? `<div class="source-table"><table><thead><tr>${s.table.headers.map(h => `<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${s.table.rows.map(row => `<tr>${row.map(cell => `<td>${esc(cell)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>` : ''}
@@ -252,19 +256,26 @@ window.addEventListener('afterprint', () => { document.body.classList.remove('pr
 
 function route() {
   const hash = location.hash || '#/';
-  const navHash = hash.startsWith('#/exam/') ? '#/' : hash;
+  const isConcept = hash === '#/learn' || hash.startsWith('#/learn/');
+  const navHash = hash.startsWith('#/exam/') ? '#/' : isConcept ? '#/learn' : hash;
+  let conceptTitle;
   document.querySelectorAll('.site-header nav a').forEach(a => a.setAttribute('aria-current', a.hash === navHash ? 'page' : 'false'));
   if (hash === '#/guide') renderGuide();
   else if (hash === '#/study') renderStudy();
+  else if (isConcept) { paper = null; state = null; conceptTitle = renderConcepts(main, hash.split('/').slice(2)); }
   else if (hash.startsWith('#/exam/')) {
-    paper = papers.find(p => p.id === hash.slice(7));
+    paper = papers.find(p => p.id === hash.split('/')[2]);
     if (paper) { state = getState(paper.id); renderPaper(); }
     else main.innerHTML = '<div class="wrap guide"><h1>시험을 찾을 수 없습니다.</h1><a href="#/">시험 목록으로 돌아가기</a></div>';
   } else renderHome();
-  document.title = paper ? `${Number(paper.id)}회 모의고사 · 컴퓨터언어 II` : hash === '#/study' ? '핵심 정리 · 컴퓨터언어 II' : '컴퓨터언어 II · 지필 모의고사';
+  document.title = isConcept ? `${conceptTitle} · 컴퓨터언어 II` : paper ? `${Number(paper.id)}회 모의고사 · 컴퓨터언어 II` : hash === '#/study' ? '핵심 정리 · 컴퓨터언어 II' : '컴퓨터언어 II · 지필 모의고사';
   const routeLabel = document.querySelector('#route-label');
-  if (routeLabel) routeLabel.textContent = paper ? `${Number(paper.id)}회 모의고사` : hash === '#/study' ? '핵심 정리' : hash === '#/guide' ? '출제 기준' : '학습 대시보드';
+  if (routeLabel) routeLabel.textContent = isConcept ? '개념 공부' : paper ? `${Number(paper.id)}회 모의고사` : hash === '#/study' ? '핵심 정리' : hash === '#/guide' ? '출제 기준' : '학습 대시보드';
   window.scrollTo(0, 0);
+  const questionNumber = Number(hash.split('/')[3]);
+  if (paper && Number.isInteger(questionNumber) && questionNumber >= 1 && questionNumber <= 20) {
+    document.getElementById(`q-${paper.id}-${questionNumber}`)?.scrollIntoView({block:'start'});
+  }
 }
 window.addEventListener('hashchange', route);
 window.addEventListener('pagehide', () => { if (paper && state) save(); });
