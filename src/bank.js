@@ -13,7 +13,7 @@ import { blueprint, bookQuestionPages, ref } from './sources.js';
 export const papers = [paper1, paper2, paper3, paper4, paper5, paper6, paper7, paper8, paper9, paper10].map(paper => ({
   ...paper,
   questions: paper.questions.map((q, i) => ({ ...q, number: i + 1, id: `${paper.id}-${i + 1}`, topic: blueprint[i],
-    sources: [...q.sources, ...(bookQuestionPages[i + 1] ? [ref('book', bookQuestionPages[i + 1])] : [])],
+    sources: [...q.sources, ...(!q.sources.some(s => s.id === 'book') && bookQuestionPages[i + 1] ? [ref('book', bookQuestionPages[i + 1])] : [])],
   })),
 }));
 
