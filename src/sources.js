@@ -5,6 +5,8 @@ export const sources = {
   ch3: { title: '3장 · 연산자, 제어문, 배열', file: 'DKL - 컴언어2_03장(C언어 Review_연산자, 제어문, 배열) V40_260917_140242.pdf' },
   ch4: { title: '4장 · 함수, 배열, 포인터', file: 'DKL - 컴언어2_04장(C언어 Reveiw 2_배열, 함수, 포인터) V21_260923_163548.pdf' },
   ch5: { title: '5장 · 클래스와 객체', file: 'DKL - 컴언어2_05장(클래스와 객체) V42_261008_131653.pdf' },
+  practice2: { title: '2장 실습문제', file: 'DKL - 컴언어2_02장(CPP 구조 및 구성요소) 실습문제_260917_024540.pdf' },
+  practice3: { title: '3장 실습문제', file: 'DKL - 컴언어2_03장(C언어 Review_연산자, 제어문, 배열) 실습문제_260917_142706.pdf' },
   practice4: { title: '4장 실습문제', file: 'DKL - 컴언어2_04장(C언어 Reveiw 2_배열, 함수, 포인터) 실습문제_260923_163557.pdf' },
   practice5: { title: '5장 실습문제', file: 'DKL - 컴언어2_05장(클래스와 객체) 실습문제_261008_141829.pdf' },
 };

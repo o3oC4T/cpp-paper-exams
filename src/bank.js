@@ -8,9 +8,14 @@ import paper7 from './paper7.js';
 import paper8 from './paper8.js';
 import paper9 from './paper9.js';
 import paper10 from './paper10.js';
+import paper11 from './paper11.js';
+import paper12 from './paper12.js';
+import paper13 from './paper13.js';
+import paper14 from './paper14.js';
+import paper15 from './paper15.js';
 import { blueprint, bookQuestionPages, ref } from './sources.js';
 
-export const papers = [paper1, paper2, paper3, paper4, paper5, paper6, paper7, paper8, paper9, paper10].map(paper => ({
+export const papers = [paper1, paper2, paper3, paper4, paper5, paper6, paper7, paper8, paper9, paper10, paper11, paper12, paper13, paper14, paper15].map(paper => ({
   ...paper,
   questions: paper.questions.map((q, i) => ({ ...q, number: i + 1, id: `${paper.id}-${i + 1}`, topic: blueprint[i],
     sources: [...q.sources, ...(!q.sources.some(s => s.id === 'book') && bookQuestionPages[i + 1] ? [ref('book', bookQuestionPages[i + 1])] : [])],

@@ -9,7 +9,7 @@ test('published page cannot combine its layout with stale standalone CSS or scri
   });
   await page.goto('/');
   await expect(page.locator('.overview-stats')).toBeVisible();
-  await expect(page.locator('.paper-card')).toHaveCount(10);
+  await expect(page.locator('.paper-card')).toHaveCount(15);
   expect(await page.locator('.site-header').evaluate(el => getComputedStyle(el).position)).toBe('fixed');
   expect(await page.locator('.site-header nav svg').first().evaluate(el => el.getBoundingClientRect().width)).toBe(18);
   await page.getByRole('link', {name:'핵심 정리',exact:true}).click();
@@ -17,9 +17,9 @@ test('published page cannot combine its layout with stale standalone CSS or scri
   expect(legacyRequests).toEqual([]);
 });
 
-test('ten papers each expose 20 questions, mandatory stars, sources and no answer before submission', async ({ page }) => {
+test('fifteen papers each expose 20 questions, mandatory stars, sources and no answer before submission', async ({ page }) => {
   await page.goto('/');
-  await expect(page.locator('.paper-card')).toHaveCount(10);
+  await expect(page.locator('.paper-card')).toHaveCount(15);
   for (const p of papers) {
     await page.goto(`/#/exam/${p.id}`);
     await expect(page.locator('.question')).toHaveCount(20);
@@ -49,20 +49,20 @@ test('typing, Tab, focus changes, flags and reload preserve independent drafts',
   await page.goto('/#/exam/01'); await expect(input).toHaveValue('std::cout\t << "Hi";');
 });
 
-test('expanded dashboard counts 200 questions and keeps previous answers when round 6 is opened', async ({ page }) => {
+test('expanded dashboard counts 300 questions and keeps previous answers when round 11 is opened', async ({ page }) => {
   await page.goto('/');
   await page.evaluate(() => localStorage.setItem('cpp-paper-exams:v1:01', JSON.stringify({ version: 1, answers: { '01-3': 'previous draft' }, flags: {}, self: {}, submitted: false })));
   await page.reload();
-  await expect(page.locator('.progress-ring')).toHaveAttribute('aria-label', '전체 200문항 중 1문항 작성');
-  await expect(page.locator('.progress-ring strong')).toHaveText('0.5%');
-  await page.goto('/#/exam/06');
-  await page.locator('#answer-06-3').fill('new draft');
+  await expect(page.locator('.progress-ring')).toHaveAttribute('aria-label', '전체 300문항 중 1문항 작성');
+  await expect(page.locator('.progress-ring strong')).toHaveText('0.3%');
+  await page.goto('/#/exam/11');
+  await page.locator('#answer-11-3').fill('new draft');
   await page.goto('/');
-  await expect(page.locator('.progress-ring strong')).toHaveText('1%');
+  await expect(page.locator('.progress-ring strong')).toHaveText('0.7%');
   await page.goto('/#/exam/01');
   await expect(page.locator('#answer-01-3')).toHaveValue('previous draft');
-  await page.goto('/#/exam/06');
-  await expect(page.locator('#answer-06-3')).toHaveValue('new draft');
+  await page.goto('/#/exam/11');
+  await expect(page.locator('#answer-11-3')).toHaveValue('new draft');
 });
 
 test('new practical questions print their conditions and correctly identify typed input', async ({ page }) => {
@@ -70,7 +70,7 @@ test('new practical questions print their conditions and correctly identify type
     await page.goto(`/#/exam/${p.id}/20`);
     const question = page.locator(`#q-${p.id}-20`);
     await expect(question).toContainText(p.questions[19].original);
-    await expect(question.locator('.sample > span')).toHaveText(p.id === '06' ? '실행 예시 · 입력값 포함' : '실행 예시');
+    await expect(question.locator('.sample > span')).toHaveText(p.questions[19].sampleIncludesInput ? '실행 예시 · 입력값 포함' : '실행 예시');
     await page.evaluate(() => { window.print = () => {}; });
     await page.getByRole('button', { name: '시험지 인쇄', exact: true }).click();
     await expect(page.locator('#print-root .print-question')).toHaveCount(20);
@@ -79,7 +79,7 @@ test('new practical questions print their conditions and correctly identify type
   }
 });
 
-test('all ten answer sheets submit, self-grade, and retain results on reload', async ({ page }) => {
+test('all fifteen answer sheets submit, self-grade, and retain results on reload', async ({ page }) => {
   test.setTimeout(90000);
   for (const p of papers) {
     await page.goto(`/#/exam/${p.id}`);
@@ -185,7 +185,7 @@ test('study notes cover highlighted topics, jump to sections, cite PDF pages, an
   await expect(page.locator('#study-lifetime-functions details')).toContainText('23–27, 38–40, 49–50쪽');
   await expect(page.locator('#study-lifetime-functions details')).toContainText('C++ Programming.pdf');
   await expect(page.locator('#study-lifetime-functions details')).toContainText('107–111, 115–121쪽');
-  await expect(page.locator('.practice-review')).toHaveCount(10);
+  await expect(page.locator('.practice-review')).toHaveCount(15);
   await page.goto('/#/exam/01');
   await expect(page.locator('#answer-01-3')).toHaveValue('my saved answer');
 });

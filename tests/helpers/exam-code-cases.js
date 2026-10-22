@@ -8,6 +8,7 @@ export const newExamCodeCases = papers.slice(5).flatMap(p => p.questions.flatMap
   return fills.map((fill, index) => ({
     id: `${q.id}-${index + 1}`,
     code: fill ? q.code.replace('__________', fill) : (v.code || q.code),
+    files: v.files,
     cases: v.cases || [{ stdin: v.stdin || '', stdout: v.stdout }],
   }));
 }));
