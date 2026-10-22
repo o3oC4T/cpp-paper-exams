@@ -5,8 +5,8 @@ import { sources } from '../src/sources.js';
 import { answered, grade, codeTokens, score, normalizeOutput } from '../src/grading.js';
 import { freshState, loadState, saveState } from '../src/storage.js';
 
-test('five complete papers preserve the requested 20-slot blueprint and mandatory stars', () => {
-  assert.equal(papers.length, 5);
+test('ten complete papers preserve the requested 20-slot blueprint and mandatory stars', () => {
+  assert.equal(papers.length, 10);
   const ids = new Set();
   for (const p of papers) {
     assert.equal(p.questions.length, 20);
@@ -26,7 +26,7 @@ test('five complete papers preserve the requested 20-slot blueprint and mandator
       if (q.type === 'output') assert.equal(normalizeOutput(q.answers[0]), normalizeOutput(q.verify.stdout));
     }
   }
-  assert.equal(ids.size, 100);
+  assert.equal(ids.size, 200);
 });
 
 test('all objective answer keys grade correctly, and all-or-nothing selections work', () => {

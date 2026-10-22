@@ -49,20 +49,22 @@ function renderHome() {
   paper = null; state = null;
   const completed = papers.filter(p => getState(p.id).submitted).length;
   const written = papers.reduce((sum, p) => sum + countAnswered(p, getState(p.id)), 0);
+  const totalQuestions = papers.reduce((sum, p) => sum + p.questions.length, 0);
+  const percent = Number((written / totalQuestions * 100).toFixed(1));
   const next = papers.find(p => !getState(p.id).submitted && countAnswered(p, getState(p.id))) || papers.find(p => !getState(p.id).submitted) || papers[0];
   main.innerHTML = `<div class="home wrap">
     <div class="dashboard-heading"><div><p class="eyebrow">YOUR STUDY SPACE</p><h1>학습 대시보드</h1><p>개념을 확인하고, 코드의 흐름을 직접 따라가 보세요.</p></div><span class="course-badge">지필 시험 연습</span></div>
     <section class="overview-stats" aria-label="학습 현황">
       <div class="stat-card"><span class="stat-icon" aria-hidden="true">✓</span><div><span>제출한 시험</span><strong>${completed}<small> / ${papers.length}회</small></strong></div><span class="stat-detail">회차별 복습</span></div>
-      <div class="stat-card"><span class="stat-icon violet" aria-hidden="true">{ }</span><div><span>작성한 답</span><strong>${written}<small> / 100문항</small></strong></div><span class="stat-detail">자동 저장</span></div>
+      <div class="stat-card"><span class="stat-icon violet" aria-hidden="true">{ }</span><div><span>작성한 답</span><strong>${written}<small> / ${totalQuestions}문항</small></strong></div><span class="stat-detail">자동 저장</span></div>
       <div class="stat-card"><span class="stat-icon amber" aria-hidden="true">≡</span><div><span>핵심 정리</span><strong>10<small>개 주제</small></strong></div><a class="stat-link" href="#/study" aria-label="핵심 정리 공부하기">↗</a></div>
     </section>
     <section class="hero">
-      <div><p class="eyebrow"><span class="live-dot"></span> C++ MIDTERM PRACTICE</p><h2>한 문제씩,<br>확실하게 익히는 C++.</h2><p class="hero-copy">강의의 강조 표시와 교재를 담은 20문항 × 5회.<br>직접 답을 쓰고, 해설로 이해를 확인하세요.</p><a class="button" href="#/exam/${next.id}">${Number(next.id)}회 ${getState(next.id).submitted ? '다시 살펴보기' : countAnswered(next, getState(next.id)) ? '이어서 풀기' : '시작하기'} <span aria-hidden="true">→</span></a></div>
-      <div class="hero-progress"><div class="progress-ring" style="--progress:${written * 3.6}deg" role="img" aria-label="전체 100문항 중 ${written}문항 작성"><div><strong>${written}<small>%</small></strong><span>전체 답안 작성</span></div></div><span class="progress-caption">조금씩 쌓이는 나의 기록</span></div>
+      <div><p class="eyebrow"><span class="live-dot"></span> C++ MIDTERM PRACTICE</p><h2>한 문제씩,<br>확실하게 익히는 C++.</h2><p class="hero-copy">강의의 강조 표시와 교재를 담은 20문항 × ${papers.length}회.<br>직접 답을 쓰고, 해설로 이해를 확인하세요.</p><a class="button" href="#/exam/${next.id}">${Number(next.id)}회 ${getState(next.id).submitted ? '다시 살펴보기' : countAnswered(next, getState(next.id)) ? '이어서 풀기' : '시작하기'} <span aria-hidden="true">→</span></a></div>
+      <div class="hero-progress"><div class="progress-ring" style="--progress:${written / totalQuestions * 360}deg" role="img" aria-label="전체 ${totalQuestions}문항 중 ${written}문항 작성"><div><strong>${percent}<small>%</small></strong><span>전체 답안 작성</span></div></div><span class="progress-caption">조금씩 쌓이는 나의 기록</span></div>
     </section>
     ${conceptHomeCard()}
-    <div class="dashboard-grid"><section class="exam-list" aria-labelledby="list-title"><div class="section-heading"><div><h2 id="list-title">모의고사 목록 <span>05</span></h2><p>회차마다 새로운 20문항을 준비했어요.</p></div><span class="completion">${completed} / ${papers.length}회 완료</span></div>
+    <div class="dashboard-grid"><section class="exam-list" aria-labelledby="list-title"><div class="section-heading"><div><h2 id="list-title">모의고사 목록 <span>${String(papers.length).padStart(2, '0')}</span></h2><p>회차마다 새로운 20문항을 준비했어요.</p></div><span class="completion">${completed} / ${papers.length}회 완료</span></div>
     <div class="paper-cards">${papers.map(p => {
       const s = getState(p.id); const n = countAnswered(p, s); const result = score(p, s);
       return `<article class="paper-card"><span class="paper-number">${p.id}</span><div class="paper-info"><div class="card-top"><h3>${p.title}</h3><span class="tag ${s.submitted ? 'green' : n ? 'blue' : ''}">${s.submitted ? '제출 완료' : n ? '작성 중' : '시작 전'}</span></div><p>${p.subtitle}</p><div class="card-meta"><span>20문항</span><span>개념 · 코드 수정 · 서술형</span></div></div>
@@ -83,7 +85,7 @@ function renderGuide() {
       <div class="source-table"><table><thead><tr><th>자료 · PDF 쪽수</th><th>화면에서 확인한 표시</th><th>반영 내용</th></tr></thead><tbody>${emphasis.map(e => `<tr><td>${esc(sources[e.source].title)}<br><span class="muted">${e.pages}쪽</span></td><td>${esc(e.mark)}</td><td>${esc(e.text)}</td></tr>`).join('')}</tbody></table></div>
     </section>
     <section class="guide-card"><h2>교재와 함께 확인했습니다.</h2><p>황기태의 『명품 C++ Programming』 3판에서 2장 C++ 프로그래밍의 기본, 3장 클래스와 객체의 해당 부분을 대조했습니다. 해설과 핵심 정리에 C++ Programming.pdf의 쪽수를 함께 표시했습니다.</p><p>시험 범위와 강조 사항은 강의 자료를 우선합니다. 강의의 5장 ‘클래스와 객체’는 책의 3장에 해당합니다. 책 뒤쪽의 내용을 추가 시험 범위로 확대하지 않았습니다.</p></section>
-    <section class="guide-card"><h2>20번은 기존 실습문제입니다.</h2><p>1회는 4장 실습문제 1, 2회는 4장 실습문제 2, 3회는 5장 실습문제 2, 4회는 4장 실습문제 5, 5회는 4장 실습문제 6입니다. 4장 두 문제는 PDF에 따로 있는 ‘시험 버전’과 같은 문제의 ‘실습 버전’ 작성 조건을 함께 제공합니다. 문제에 있는 변수·함수 이름과 출력 문구를 따릅니다.</p></section>
+    <section class="guide-card"><h2>20번은 기존 실습문제입니다.</h2><ul>${papers.map(p => `<li>${Number(p.id)}회: ${esc(p.questions[19].original)}</li>`).join('')}</ul><p>1·2회는 PDF에 따로 있는 ‘시험 버전’과 같은 문제의 ‘실습 버전’ 작성 조건을 함께 제공합니다. 문제에 있는 변수·함수 이름과 출력 문구를 따릅니다.</p></section>
     <section class="guide-card"><h2>채점 방식</h2><ul><li>회차마다 20문항, 연습용으로 각 5점입니다. 실제 시험의 배점은 아닙니다.</li><li>‘모두 고르기’와 O/X 묶음은 해당 문항을 모두 맞혀야 5점입니다.</li><li>출력은 줄바꿈과 내용을 비교합니다. 줄 끝 공백·CRLF/LF·연속된 가로 공백은 허용합니다.</li><li>한 줄 코드는 알려진 답안과 기호·이름을 비교합니다. 다른 표현은 오답으로 단정하지 않고 ‘직접 확인’으로 남깁니다.</li><li>20번 서술형은 예시 답안과 기준을 보고 직접 채점합니다. 종이 답안도 제출 후 직접 채점할 수 있습니다.</li><li>코드를 서버로 전송하거나 컴파일하지 않습니다. 답안은 현재 브라우저에만 저장됩니다.</li></ul></section>
     <section class="guide-card"><h2>혼동하기 쉬운 기준</h2>${standardNotes.map(n => `<p>${esc(n.text)} <a href="${n.url}" target="_blank" rel="noopener noreferrer">${esc(n.title)} ↗</a></p>`).join('')}</section>
     <section class="guide-card"><h2>해설에서 찾을 수 있는 자료</h2><p>쪽수는 PDF의 첫 페이지를 1쪽으로 센 번호입니다. 원본 PDF는 수업 자료 폴더에서 확인하세요.</p><ul class="file-list">${Object.values(sources).map(s => `<li><strong>${s.title}</strong><br><span>${esc(s.file)}</span></li>`).join('')}</ul></section>
@@ -112,7 +114,7 @@ function questionBody(q) {
     ${q.instructions ? `<ul class="instructions">${q.instructions.map(i => `<li>${esc(i)}</li>`).join('')}</ul>` : ''}
     ${q.code ? code(q.code) : ''}
     ${q.expectedOutput ? `<div class="sample"><span>출력 결과</span>${code(q.expectedOutput)}</div>` : ''}
-    ${q.sample ? `<div class="sample"><span>실행 예시${q.number === 20 && paper?.id !== '03' ? ' · 입력값 포함' : ''}</span>${code(q.sample)}</div>` : ''}`;
+    ${q.sample ? `<div class="sample"><span>실행 예시${(q.sampleIncludesInput ?? (q.number === 20 && paper?.id !== '03')) ? ' · 입력값 포함' : ''}</span>${code(q.sample)}</div>` : ''}`;
 }
 
 function answerInput(q) {

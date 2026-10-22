@@ -1,3 +1,4 @@
+import { papers } from './bank.js';
 import { courses, totalSteps, totalChecks } from './concept-content.js';
 import { sources } from './sources.js';
 import { traces, loopTrace, updateCircle, updatePointer } from './concept-models.js';
@@ -79,7 +80,7 @@ function lessonHTML(c,s,index) {
     ${s.table ? `<div class="source-table"><table><thead><tr>${s.table.headers.map(h=>`<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${s.table.rows.map(row=>`<tr>${row.map(v=>`<td>${esc(v)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`:''}
     ${s.trace ? traceHTML(s.trace) : ''}
     ${s.sandbox === 'circle' ? circleHTML() : s.sandbox === 'pointer' ? pointerHTML() : ''}
-    ${s.practice ? `<div class="practice-links">${[1,2,3,4,5].map(n=>`<a class="button secondary small" href="#/exam/0${n}/20">${n}회 20번 풀기 →</a>`).join('')}</div>`:''}
+    ${s.practice ? `<div class="practice-links">${papers.map(p=>`<a class="button secondary small" href="#/exam/${p.id}/20">${Number(p.id)}회 20번 풀기 →</a>`).join('')}</div>`:''}
     <aside class="concept-takeaway"><strong>이 단계에서 가져갈 것</strong><p>${rich(s.takeaway)}</p></aside>
     ${s.external ? `<p class="concept-reference"><a href="${s.external.url}" target="_blank" rel="noopener noreferrer">${esc(s.external.title)} ↗</a></p>`:''}
     ${sourcesHTML(c)}
